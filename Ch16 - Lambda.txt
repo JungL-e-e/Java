@@ -1,0 +1,347 @@
+16-1 람다식이란?
+* 함수형 프로그래밍이란 함수를 정의하고 이 함수를 데이터 처리부로 보내 데이터를 처리하는 기법
+* 람다식은 데이터 처리부에 제공되는 함수 역할을 하는 매개변수를 가진 중괄호 블록이다.
+* 람다식을 익명 구현 객체로 변환한다(이름이 없는 인터페이스 구현 객체)
+
+1. 반환 값이 있는 메서드의 경우, return문 내신 '식(expression)'으로 대신할 수 있다. 식으로 표현 시 세미콜론(;)은 붙이지 않는다.
+2. 매개변수 중 어느 하나의 타입만 생략하는 건 허용되지 않는다. ex) (String a, b)
+3. 매개변수가 하나뿐인 경우 괄호()를 생략할 수 있다. 단, 매개변수의 타입이 있으면 생략할 수 없다.
+4. 괄호{} 안의 문장이 하나일 때는 괄호{}를 생략할 수 있다. 이때도 세미콜론(;)은 같이 생략한다.
+
+람다식도 익명 객체, 익명 클래스의 인스턴스이므로 람다식에서 외부에 선언된 변수에 접근하는 규칙은 익명 클래스와 같다. 
+- 람다식 내에서 사용하는 지역변수는 final이 붙지 않았어도 상수로 간주된다.
+- 람다식 내에서 사용하는 지역변수는 람다식 내에서나 다른 어느 곳에서도 변경할 수 없다.
+- 반면에 외부 클래스의 인스턴스 변수는 변경이 가능하다.
+- 람다식 매개변수로 외부 지역변수와 같은 이름의 변수는 허용되지 않는다.
+----------------------------------------------------------------------------------------------------------------
+함수형 인터페이스 이름 - java.lang.Runnable
+람다식 메소드 이름 - void run()
+매개변수도 없고, 반환값도 없음.
+Runnable 이라는 이름에 맞게 "실행 가능한" 이라는 뜻을 나타내며 이름 그대로 실행만 할 수 있다고 생각하면 됩니다.
+
+함수형 인터페이스 이름 - Supplier<T>	/ Callable<V>	//* 단지 Callable 은 Runnable 과 함께 병렬 처리를 위해 등장했던 개념으로서 					ExecutorService.submit 같은 함수는 인자로 Callable 을 받습니다.
+람다식 메소드 이름 - T get()
+매개변수가 없고, 반환값만 있음.
+공급자라는 이름처럼 아무것도 받지 않고 특정 객체를 리턴합니다.
+
+함수형 인터페이스 이름 - Consumer<T>
+람다식 메소드 이름 - void accept(T t)
+매개변수가 있고, 반환값이 없음
+소비자라는 이름에 걸맞게 무언가 (인자) 를 받아서 소비만 하고 끝낸다고 생각하면 됩니다.
+
+함수형 인터페이스 이름 - Function<T,R>
+람다식 메소드 이름 - R apply(T t)
+일반적인 매개변수 하나를 받아 반환하는 함수
+수학식에서의 함수처럼 특정 값을 받아서 다른 값으로 반환해줍니다.
+T 와 R 은 같은 타입을 사용할 수도 있습니다.
+
+함수형 인터페이스 이름 - Predicate<T>
+람다식 메소드 이름 - boolean test(T t)
+Predicate 는 인자 하나를 받아서 boolean 타입을 리턴합니다.
+조건식을 표현하는데 사용, 반환 타입은 boolean
+*Predicate는 조건식을 람다식으로 표현하는데 사용한다.
+ex)	Predicate<Integer> isZero = (number) -> number == 0 ? true : false;
+
+Comparator<T>
+int compare(T o1, T o2)
+Comparator 은 T 타입 인자 두개를 받아서 int 타입을 리턴합니다.
+람다식으로는 (T, T) -> int 로 표현합니다.
+----------------------------------------------------------------------------------------------------------------
+BiConsumer<T, U>
+void accept(T t, U u)
+두 개의 매개변수, 반환 값은 없음.
+
+BiPredicate<T, U>
+boolean test(T t, U u)
+두 개의 매개변수, 반환 값은 boolean
+
+BiFunction<T, U, R>
+R apply(T t, U u)
+두 개의 매개변수, 하나의 결과 반환
+----------------------------------------------------------------------------------------------------------------
+* Function, BiFunction 인터페이스의 자식이 있는데, 각각 UnaryOperator와 BinaryOperator이다.
+* 이 둘의 특징은 매개변수의 타입과 반환타입의 타입이 모두 일치한다는 점이다.
+
+UnaryOperator<T>
+T apply(T t)
+
+BinaryOperator<T>
+T apply(T t, T t)
+
+주로 사용하는 컬렉션 프레임워크의 인터페이스(List, map 등)에 다수의 디폴트 메서드가 추가되었는데, 그중의 일부는 함수형 인터페이스를 사용한다.
+----------------------------------------------------------------------------------------------------------------
+
+Collection
+boolean removeIf(Predicate<E> f)
+조건에 맞는 값 삭제
+
+List
+void replaceAll(UnaryOperator<E> o)
+리스트의 모든 요소를 조건에 맞게 대체
+
+iterable
+void forEach(Consumer<T> a)
+모든 요소에 작업 a를 실행
+
+Map
+V compute(K key,BiFunction<K,V,V> f)
+지정된 키 값에 작업 f를 수행
+
+V computeIfAbsent(K key, Function<K,V> f)
+키가 없으면 작업 f 수행 후 추가
+
+V computeIfPresent(K key, BiFunction<K,V,V> f)
+지정된 키가 있을 때, 작업 f 수행
+
+V merge(K key, V value, Bifunction<V,V,V> f)
+모든 요소에 병합작업 f를 수행
+
+void forEach(BiConsumer<K, V> a)
+모든 요소에 작업 a 수행
+
+void replaceAll(BiFunction<K,V,V> f)
+모든 요소에 치환작업 f 수행
+
+Map인터페이스에 있는 compute로 시작하는 메서드들은 맵의 value를 변환하는 일을 하고 merge는 map을 병합한다.
+----------------------------------------------------------------------------------------------------------------
+DoubleToIntFunction/DoubleToLongFunction/IntToDoubleFunction/
+IntToLongFunction/LongToDoubleFunction/LongToIntFunction
+AToBFunction
+double -> applyAsInt(double b) -> int(A)       -> applyAsB(A)            -> B
+입력 : A타입출력 : B타입
+
+ToIntFunction<T>/ToDoubleFunction<T>/ToLongFunction<T>
+ToBFuntion
+T   ->   applyAsInt(T t)     -> intT   ->   applyAsB(T t)       -> B
+입력 : 제네릭출력 : B 타입
+
+IntFunction<R>/BooleanFunction<R>/LongFunction<R>
+AFunction
+int  ->   apply(int i)       ->  RA    ->   apply(A a)       ->  R
+입력 : A출력 : 제네릭
+
+ObjIntConsumer<T>/ObjDoubleConsumer<T>/ObjLongConsumer<T>
+ObjAFunction
+T, int  ->  accept(T t, int i)    -> 출력 xT, A   ->  accept(T t, A a)   -> 출력 x
+입력 : T, A
+
+----------------------------------------------------------------------------------------------------------------
+
+ex)	람다식: (매개변수, ...) -> {처리내용}
+
+	public interface Calculable {
+		void calculate(int x, int y);
+	}					// 이런 인터페이스가있을때 
+	
+	Calculable calc = new Calculable() {
+		@Override
+		public void calculate(int x, int y) { 처리내용 }
+	};					// 이렇게 익명 구현 객체를 생성할 수 있다.
+
+	이것을 람다식으로 표현하면,
+	(x, y) -> { 처리내용 };
+
+	public void action(Calculable calculable) {
+		int x = 10;
+		int y = 4;
+		calculable.calculate(x,y);
+	}					// 이와같은 메소드가 있을때
+	
+	action( (x, y) -> {
+		int result = x + y;
+		System.out.println(result);
+	});					// 여기서 action() 메소드는 람다식을 이용해서 내부 데이터를 처리하는 처리부 역할
+
+* 인터페이스의 익명 구현 객체를 람다식으로 표현하려면 인터페이스가 하나의 추상 메소드만 가져야 한다.
+* 하나의 추상 메소드를 가지고있는 인터페이스를 함수형 인터페이스라 한다.
+* @FunctionalInterface 어노테이션은 선택사항이지만 함수형 인터페이스를 작성할 수 있게 도와준다.
+
+요약하자면, 처리내용이 없는 하나의 추상메소드를 가지고있는 인터페이스를 사용하려면 그 메소드를 오버라이딩하여 오버라이딩한 객체를 불러야만 사용가능한데,
+람다식을 사용하면 그과정을 모두 무시하고 바로 사용할 수 있다.
+
+
+
+16-2 매개변수가 없는 람다식
+
+ex)	( ) -> {
+		실행문;
+		실행문;		// 실행문 하나일땐 중괄호 생략 가능
+	}		
+
+
+16-3 매개변수가 있는 람다식
+* 매개변수를 선언한 때 타입은 생략가능하며 구체적인 타입 대신에 var 도 사용 가능, 하지만 일반적으로 타입 생략
+ex)	(타입 매개변수, ...) -> {
+		실행문;
+		실행문;
+	}
+
+	1. (타입 매개변수, ...) -> 실행문
+	2. (var 매개변수, ...) -> 실행문
+	3. (매개변수, ...) -> 실행문
+* 매개변수하나일대 괄호 생략가능, var 붙일수 없음
+
+
+
+16-4 리턴값이 있는 람다식
+* 함수형 인터페이스의 추상 메소드에 리턴값이 있을 경우 return문이 필요하다
+ex)	(매개변수, ...) -> {
+		실행문;
+		return 값;
+	}
+* 매개변수 하나일때 return 생략 가능
+ex) 	(매개변수, ...) -> (return) 값
+
+
+
+16-5 메소드 참조
+* 메소드를 참조해서 매개변수의 정보 및 리턴 타입을 알아내 람다식에서 불필요한 배개변수를 제거하는 것이 목적
+ex)	(left, right) -> Math.max(left, right);
+	
+	Math :: max;	// 이게 뭐시여 공 부 다시해야겠다.
+
+1. 정적메소드와 인스턴스 메소드 참조
+
+정적메소드 = 클래스 :: 메소드
+
+인스턴스메소드 = 참조변수 :: 메소드	
+* 아 이해했다.
+* 실행문을 생략하고 싶으면 위에 메소드 참조를 사용하면 실행문을 작성할 필요없어짐(대신 메소드를 참조할 클래스가 있어야함)
+
+2. 매개변수의 메소드 참조
+ex)	(a,b) -> {a.instaceMethod(b);}
+	클래스 :: instaceMethod
+
+*헷갈릴때는 책의 예시를 보면 이해 가능
+
+
+16-6 생성자 참조
+* 생성자를 참조한다는 것은 객체를 생성한다는것을 의미
+ex)	(a,b) -> { return new 클래스(a,b); }
+	클래스 :: new
+
+
+
+자바의 정석 람다식편
+* 메서드를 간단한식으로 표현
+* 함수 = 클래스에 독립적, 메소드 = 클래스에 종속적
+* 익명 함수(익명 객체)와 동등하다
+* 익명 객체는 생성과 선언을 동시에 하는 객체이다.
+ex)	new Object() {
+		int max(int a, int b) {
+			return a > b ? a : b;
+		}
+	}						// 이것과 (a, b) -> a > b ? a : b 는 같다
+* 그렇다면 람다식을 다루기위한 참조변수는 Object인가? 아니다! 이후에 설명함
+
+ex)	Object obj = new Object() {
+		int max(int a, int b) {
+			return a > b ? a : b;
+		}
+	};
+
+	int val = obj.max(3,5);	// 오류가 뜬다. 왜일까? Object 클래스 안에는 max가 없기 때문이다! 위에서 바로만든 익명객체이기때문에
+					그럼 형변환을 해줘야하나? 
+*** 이때 필요한 것이 함수형 인터페이스 이다.
+
+자바의 정석 함수형 인터페이스
+* 하나의 추상 메서드만 선언된 인터페이스
+* Object를 쓸 수 없기 때문에 임의로 인터페이스를 만들어서 참조변수를 만들어 주는 것이다.
+ex)	interface MyFunction {
+		public abstract int max(int a, int b);
+	}
+	
+	Myfunction f = new Myfunction() {
+		public int max(int a, int b) {
+			return a > b ? a : b;
+		}
+	};
+	
+	int val = f.max(3,5);	// 가능!
+
+그럼 이것을 람다식으로 표현하면
+ex)	Myfunction f = (a, b) -> a > b ? a : b
+	int val = f.max(3,5);
+
+ex) 	Collections.sort(list, new Comparator<String>() {
+				public int compare(String s1, String s2) {
+					return s2.compareTo(s1);
+				}
+			});		// comparator 도 함수형 인터페이스 이므로
+
+	Collection.sort(list, (s1, s2) -> s2.compareTo(s1)); 으로 가능
+
+* 함수형 인터페이스 타입의 매개변수와 반환타입
+ex)	void aMethod(Myfunction f) {
+		f.myMethod();	// Myfunction 에 정의 된 메소드
+	}
+
+	Myfunction f = () -> System.out.println("myMethod()");
+	aMethod(f);
+
+	aMethod(() -> System.out.println("myMethod()"));	// 이렇게도 생략가능
+* 이렇게 매개변수로 람다식을 쓸 수 있다.
+* 반대로 반환 타입으로도 가능
+ex)	MyFunction myMethod() {
+		Myfunction f = () -> {};
+		return f;
+	}
+
+	Myfunction myMethod() {
+		return () -> {};
+	}
+
+함수형 인터페이스의 종류 - java.util.function - 위에 있음 
+
+* Predicate의 결합
+	and() = &&, or() = ||, negate() = ! 로 Predicate 결합 가능
+
+ex)	Predicate<Integer> p = i -> i < 100;
+	Predicate<Integer> q = i -> i < 200;
+	Predicate<Integer> r = i -> i%2 == 0;
+	
+	Predicate<Integer> notP = p.negate();	// i >= 100
+	Predicate<Integer> all = notP.and(q).or(r);
+	Predicate<Integer> all2 = notP.and(q.or(r));
+
+* 등가비교를 위한 Predicate 작성은 isEqual()을 사용
+ex)	Predicate<String> p = Predicate.isEqual(str1)
+	Boolean result = p.test(str2);
+
+이제 이 람다식을 이용하여 컬렉션 프레임워크 동작들을 수월하게 할 수 있다.
+
+* Collection : removeIf(Predicate<E> filter) -> 조건에 맞는 요소 삭제
+* List : 
+replaceAll(UnaryOperator<E> operator) -> 모든 요소 변형 후 대체
+* Iterable : forEach(Consumer<T> action) -> 모든요소에 action 수행
+* Map : 
+compute(K key, BiFunction<K,V,V> f) -> 지정된 키값에 f 수행
+computeIfAbsent(K key, Function<K,V> f) -> 키가 없으면 작업 f 수행 후 추가
+computeIfPresent(K key, BiFunction<K,V,V> f) -> 지정된 키가 없을 때 작업 f 수행
+merge(K key, V value, BiFunction<K,V,V> f) -> 모든 요소에 병합작업 f 수행
+forEach(BiConsumer<K,V> action) -> 모든 요소에 작업 action 수행
+replaceAll(BiFunction<K,V,V> f) -> 모든 요소에 치환작업 f 수행
+
+* 메서드 참조 - 람다식을 더욱 더 간편히 = 클래스이름::메소드이름
+
+1. static메서드 참조
+ex)	Integer method(String s) {
+		return Integer.parseInt(s);
+	}
+
+	Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+	Function<String, Integer> f = Integer::parseInt 	// 메서드 참조
+2. 인스턴스메서드 참조
+3. 특정 객체 인스턴스메서드 참조 (거의 안씀) 
+
+
+* 생성자의 메서드 참조
+ex)	Supplier<MyClass> s = () -> new MyClass();
+	Supplier<MyClass> s = MyClass::new;
+	
+	Function<Integer, MyClass> f = (i) -> new MyClass(i);
+	Function<Integer, MyClass> f = MyClass::new;
+
+* 배열과 메서드 참조
+ex)	Function<Integer, int[]> f = x -> new int[x];
+	Function<Integer, int[]> f2 = int[]::new;

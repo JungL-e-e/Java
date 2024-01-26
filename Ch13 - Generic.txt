@@ -1,0 +1,57 @@
+13-1 제네릭
+
+* content 필드를 Box 클래스에 선언한다고 할 때, 이 content는 어떤 타입인지 모른다. 따라서 Object 타입으로 선언한다.
+* Object는 모든 타입의 최상위 부모 클래스이므로 어떤 객체는 대입이 가능하다.
+* 하지만 어떤 내용물이 저장되있는지 모른다면 insatnceof 연산자로 타입을 조사할 수는 있지만, 모든 종류의 클래스를 대상으로 조사할 수는 없다.
+* 따라서 우리는 Box를 생성하기전에 어떤 내용물을 넣을지 이미 알고 있다. 따라서 Box를 생성할 때 저장할 내용물의 타입을 미리 알려주면 Box는 content에
+ 무엇이 대입되고, 읽을 때 어떤 타입으로 제공할지를 알게 된다.
+
+*정리하자면, 제네릭이란 결정되지 않은 타입을 파라미터로 처리하고 실제 사용할 때 파라미터를 구체적인 타입으로 대체시키는 기능이다.
+ex)	public class Box <T> {
+		public T content;
+	}						// Box 클래스에 <T> 를 붙여줌으로써 T 는 임의의 타입이다.
+	
+	Box<Integer> box = new Box<Integer>();
+	box.content = 100;
+	int content = box.content;
+
+	Box<String> box = new Box<String>();
+	box.content = "이정";
+	String content = box.content;	//강제타입변환을 할 필요없이 이렇게 바로 만들 수 있다.
+
+* 변수를 선언할 때 동일한 타입으로 호출하고 싶다면 생성자 호출 시 생성자에는 타입을 명시하지않고 <>만 붙일 수 있다.
+ex)	Box<String>box = new Box<>();
+
+13-2 제네릭 타입
+* 제네릭 타입은 결정되지 않은 타입을 파라미터로 가지는 클래스와 인터페이스를 말한다.
+ex)	public class 클래스명<A, B, ...> { ... }	// * 타입은 변수명과 동일한 규칙에 따라 작성가능하지만 대부분 알파벳 대문자 한글자로 표현
+
+
+
+13-3 제네릭 메소드
+* 타입 파라미터를 가지고있는 메소드
+ex)	public <A, B, ...> 리턴타입 메소드명(매개변수, ...) { ... }
+	
+	Box<Integer> box1 = boxing(100);
+	Box<String> box2 = boxing("안녕하세요");
+
+
+13-4 제한된 타입 파라미터
+* 특정 타입과 자식 또는 구현관계에 있는 타입만 대체할 수 있는 타입 파라미터
+ex)	public <T extends 상위타입> 리턴타입 메소드(매개변수, ...) { ... }
+	
+	public <T extends Number> boolean compare(T t1,T t2) {
+		double v1 = t1.doubleValue();
+		double v2 = t2.doubleValue();
+		return (v1 == v2);
+	}
+
+
+
+13-5 와일드카드 타입 파라미터 
+* 제네릭 타입을 매개값이나 리턴 타입으로 사용할 때 타입 파라미터로 ?(와일드카드)를 사용할 수 있다.
+* ?는 범위에 있는 모든 타입으로 대체할 수있다는 표식
+ex)	리턴타입 메소드명(제네릭타입<? extends Student> 변수) { ... }	// student와 자식 클래스들만 가능
+	리턴타입 메소드명(제네릭타입<? super Worker> 변수) { ... }	// Worker와 부모 클래스만 가능
+	리턴타입 메소드명(제네릭타입<?> 변수) { ... }	// 어떤 타입이든 가능
+	

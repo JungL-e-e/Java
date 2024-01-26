@@ -1,0 +1,179 @@
+18-1 입출력 스트림
+* 데이터는 키보드, 파일 또는 프로그램으로부터 입력 가능하다
+* 반대로 데이터는 모니터로 출력, 파일저장, 다른프로그램으로 전송도 가능하다 이것을 데이터 입출력이라 한다.
+* 자바는 입력 스트림과 출력 스트림을 통해 데이터를 입출력한다.
+* 스트림은 단방향으로 흐르는것을 말한다.
+
+1. 바이트 스트림: 그림, 멀티미디어, 문자등 모든 종류의 데이터 입출력할때 사용
+	입력 - InputStream
+	출력 - OutputStream
+2. 문자 스트림: 문자만 입출력할때 사용
+	입력 - Reader
+	출력 - Writer
+
+
+18-2 바이트 출력 스트림
+OutputStream	- FileOutputStream
+		- PrintStream
+		- BufferedOutputStream
+		- DataOutputStream
+
+주요메소드
+write(int b)	- 1byte 출력
+write(byte[]b)	- 주어진 배열 b의 모든 바이트 출력
+write(byte[] b, int off, int len)	- 배열b[off] 부터 len 개의 바이트 출력
+flush()	- 출력버퍼에 잔류하는 모든 바이트 출력
+close()	- 출력 스트림닫고 사용 메모리 해제
+
+1. 1 바이트 출력
+ex)	OutputStream os = new FileOutputStream("파일경로");
+	os.write(a);
+	os.write(b);
+
+	os.flush();
+	os.close();
+
+2. 바이트 배열 출력
+* 일반적으로 바이트 배열을 통째로 출력하는 경우가 많다
+ex)	OutputStream os = new FileOutputStream("파일경로");
+	byte[] array = {10, 20, 30};
+	os.write(array);
+	os.flush();
+	os.close();
+
+
+18-3 바이트 입력 스트림
+InputStream	- FileInputStream
+		- BufferedInputStream
+		- DataInputStream
+
+주요메소드
+read()	- 1byte 읽고 바이트 리턴
+read(byte[]b)	- 읽은 바이트를 주어진 배열에 저장후 읽은 바이트 수를 리턴
+close()	- 닫고 사용 메모리 해제
+
+1. 1 바이트 읽기
+* 더이상 입력 스트림으로부터 바이트를 읽을 수 없다면 read() 메소드는 -1 리턴
+ex)	while(true) {
+		int data = is.read();
+		if (data == -1) break;
+	}
+
+2. 바이트 배열로 읽기
+ex)	InputStream is = ...;
+	byte[] data = new byte[100];
+	while (true) {
+		int num = is.read(data);
+		if (num == -1) break;
+	}
+
+* is.transferTo(os); 	// 간단하게 입력 스트림에서 출력스트림으로 바이트를 복사하는 메소드
+
+
+
+18-4 문자 입출력 스트림
+1. 문자 출력
+Writer	- FileWriter
+	- BufferedWriter
+	- PrintWriter
+	- OutputStreamWriter
+
+주요메소드
+write(int c)	- 한문자 출력
+write(char[] cbuf)	- 배열 모든 문자 출력
+write(char[] cbuf, int off, int len)	- 배열에서 off부터 len 길이 출력
+write(String str)	- 매개값으로 주어진 문자열 출력
+write(String str, int off, int len)	- 문자열에서 off부터 len 길이 출력
+flush()	- 잔유하는 모든 문자 출력
+close()	- 닫고 사용 메모리 해제
+
+2. 문자 읽기
+Reader	- FileReader
+	- BufferedReader
+	- InputStreamReader
+
+주요메소드
+read()	- 1개 문자 읽고 리턴
+read(char[] cbuf)	- 문자 배열저장, 읽은 문자 수 리턴
+close()	- 닫고 사용메모리 해제
+
+
+
+18-5 보조 스트림
+* 보조 스트림이란 다른 스트림과 연결되어 여러가지 편리한 기능을 제공해주는 스트림
+* 보조 스트림은 자체적으로 입출력을 수행할 수 없음 - 입출력 소스로부터 직접 생성된 입출력 스트림에 연결
+ex)	보조스트림 변수 = new 보조스트림(입출력스트림);
+	InputStream is = new FileInputStream("...");
+	ImputStream reader = new InputStreamReader( is );
+	BufferedReader br = new BufferedReader( reader );
+* 보조 스트림은 다른 보조 스트림과 연결되어 스트림 체인으로 구성 가능
+
+InputStreamReader			- 바이트 스트림을 문자스트림으로 변환
+Buffered ~~~				- 입출력 성능 향상
+DataInputStream, DataOutputStream	- 기본 타입 데이터 입출력
+PrintStream, PrintWriter		- 줄바꿈처리 및 형식화된 문자열 출력
+ObjectInputStream, ObjectOutputStream 	- 객체 입출력
+
+
+
+18-6 문자 변환 스트림
+* 바이트 스트림에서 데이터가 문자라면 문자스트림으로 바꾸는것이좋다
+1. InputStream > Reader
+ex)	InputStream is = new FileInputStream("파일명");
+	Reader reader = new inputStreamReader(is);
+
+2. OutputStream > Writer
+ex)	OutputStream is = new FileOutputStream("파일명");
+	Writer writer = new OutputStreamWriter(is);
+
+
+18-7 성능 향상 스트림
+* 출력 스트림은 데이터를 꾸준히 반복하여 보내지만 버퍼는 데이터가 쌓이기를 기다렸다가 꽉차면 한번에 보냄으로써 출력 횟수를 줄여 성능 향상을 시긴다.
+ex)	BufferedInputStream bis = new BufferedInputStream(바이트 입력 스트림);
+
+* 문자입력스트림을 버퍼를 사용하면 readLine() 메소드 사용가능	// 파일에서 한 행씩 읽음
+
+
+18-8 기본 타입 스트림
+ex)	DataInputStream dis = new DataInputStream(바이트 입력 스트림);
+	DataOutputStream dos = new DataOutputStream(바이트 출력 스트림);
+* 메소드들은 기본 타입인 boolean, char, short, int, long, float, double 값을 입출력할 수 있다.
+
+
+18-9 프린트 스트림
+* 프린터와 유사하게 출력하는 print(), println(), printf() 메소드를 가지고있는 보조 스트림
+ex)	PrintStream ps = new PrintStream(바이트 출력 스트림);
+	PrintWriter pw = new PrintWriter(문자 출력 스트림);
+
+
+18-10 객체 스트림
+* 객체를 출력하려면 일렬로 늘어선 바이트로 변경해야하는데 이것을 직렬화라고하며, 객체의 필드값으로 복원하는 것을 역직렬화라고 한다.
+ex)	ObjectInputStream ois = new ObjectInputStream(바이트 입력 스트림);
+	ObjectOutputStream oos = new ObjectOutputStream(바이트 출력 스트림);
+	
+	oos.writeObject(객체);	// 객체 직렬화
+	
+	객체타입 변수 = (객체타입) ois.readObject();	// 메소드의 리턴타입은 Object이므로 구체적인 타입으로 강제 타입 변환해야 함
+
+1. Serializable 인터페이스
+* Serializable 인터페이스는 멤버가 없는 빈 인터페이스지만, 객체를 직렬화할 수 있다고 표시하는 역할
+* transient로 선언된 필드값은 직렬화에서 제외
+
+2. serialVersionUID 필드
+* 직렬화, 역직렬화 사용된 클래스느 기본적으로 동일해야함
+* 두 클래스 내용이 다르더라고 동일한 serialVersionUID 상수값을 가지면 가능
+ex)	static final long serialVersionUID = 1;
+* 공부 필요
+
+
+18-11 File 과 File 클래스
+
+1. File 클래스
+ex)	File file = new File("경로");
+* File 객체를 생성했다해도 파일이나 디렉토리가 생성은 안됨.
+	boolean isExist = file.exists();	// 파일이나 폴더가 존재하면 true 리턴
+* 여러 메소드들 참조
+
+2. Files 클래스
+* 정적 메소드로 구성	- 객체로 만들 필요가 없다.
+ex)	Path path = Paths.get(String first, String ... more)

@@ -1,0 +1,289 @@
+Ch12 - java.base 모듈
+
+12.1 API 도큐먼트
+* 자바 표준 모튤에서 제공하는 라이브러리는 방대 > 쉽게 찾아주는 API 도큐먼트
+* 라이브러리 = 클래스 + 인터페이스 집합체
+* API 도큐먼트 = 사용하기 위한 방법 기술
+
+1. 선언부 = 어떻게 정의 되어있는가
+2. 상속계층도 = 전체 상속관계
+---------------------------------------------------------------------
+Module java.base
+Package java.lang
+Class String
+-------------------------
+java.lang.Object	> 상속계층도
+java.lang.String	>
+-------------------------
+All Implemented Interfaces:
+Serializable, CharSequence, Comparable<String>, Constable, ConstantDesc
+-------------------------------------------------------------------------------------
+public final class String
+extends Object										> 선언부
+implements Serializable, Comparable<String>, CharSequence, Constable, ConstantDesc
+--------------------------------------------------------------------------------------
+The String class represents character strings. All string literals in Java programs, such as "abc", are implemented as instances of this class.
+Strings are constant; their values cannot be changed after they are created. String buffers support mutable strings. Because String objects are immutable they can be shared. For example:
+
+     String str = "abc";
+...
+-----------------------------------------------------------------------------
+
+* Summary 에서 선언된 멤버별로 링크를 제공 (링크가 있으면 공개된(public, protected))
+	1. NESTED:	중첩 클래스, 인터페이스 목록이동
+	2. FIELD:	필드 목록이동
+	3. CONSTR:	생성자 목록이동
+	4. METHOD:	메소드 목록이동
+
+
+
+12.2 java.base 모듈
+
+* 기본 모듈 - 모듈중 유일하게 requires하지 않아도 사용 가능
+	1. java.lang:	자바 언어의 기본 클래스 제공 ( String, System, Integer, Double, Exception 등등)
+	2. java.util:	자료 구조와 관련된 컬렉션 클래스 제공 (Scanner)
+	3. java.text:	날짜 및 숫자를 원하는 형태의 문자열로 만들어주는 포맷클래스
+	4. java.time:	날짜 및 시간을 조작하거나 연산하는 클래스
+	5. java.io:	입출력 스트림 클래스를 제공
+	6. java.net:	네트워크 통신과 관련된 클래스 제공
+	7. java.nio: 	데이터 저장을 위한 buffer 및 새로운 입출력 클래스 제공
+
+
+
+12.3 Object 클래스
+
+* 클래스를 선언할 때 extends 키워드로 다른 클래스를 상속하지 않으면 암시적으로 java.lang.Object 클래스를 상속 
+	(자바의 모든 클래스는 object의 자식이나 자손 클래스)
+
+1. 객체 동등 비교
+	public boolean equals(Object obj)
+ex)	boolean result = obj1.equals(obj2);
+
+어떤 클래스에서 equals 를 쓰고 싶으면 그 멤버에 public boolean equals(Object obj) 를 오버라이딩해주어 만든다.
+
+2. 객체 해시코드	- 객체를 식별하는 정수
+	public int hashCode()
+
+* 15장에서 배울 HashSet 은 hashCode() 와 equals() 메소드를 이용하여 동등객체인지 판단, 동등 객체를 중복 저장하지 않음
+
+3. 객체 문자 정보
+* 기본적으로 Object의 toString() 메소드는 '클래스명@16진수해시코드'로 구성된 문자열을 리턴
+ex)	Object obj = new Object();
+	System.out.println(obj.toString()); 	> java.lang.Object@de6ced
+
+4. 레코드 선언
+* 데이터 전달을 위한 DTO를 작성할 때 반복적으로 사용되는 코드를 줄이기 위해 레코드 도입
+* 간단하게 말하자면 레코드 선언은 
+	public record(class 대신) Person(String name, int age) {
+	}
+	이렇게 선언하ㅣ면 필드는 private final 필드자동생성, 생성자 및 getter 메소드 추가, hashCode(), equals(), toString() 
+	메소드를 재정의한 코드로 자동으로 추가된다.
+
+5. 롬복 사용하기
+* 표준 라이브러리는 아니지만 개발자들이 즐겨 쓴느 자동 코드 생성 라이브러리 (레코드 선언과 비슷)
+* 레코드와의 차이는 필드가 final이 아니며 Getter 는 getXxx, Setter 는 setXx로 생성된다는 것이다.
+
+
+
+12.4 System 클래스
+
+* 자바 프로그램은 자바 가상 머신(JVM) 위에서 실행된다. 따라서 자바코드로 직접 접근하기가 어렵다. 이때 System 클래스의 정적 필드와 메소드를 이용하면
+	여러가지 가능
+
+	필드 -	out: 문자출력
+		err: 에러내용출력
+		in : 키보드 입력
+	메소드 -	exit(int status):	프로세스 종료
+		currentTimeMillis():	현재 시간을 밀리초 단위의 long값 리턴
+		nanoTime():		현재 시간을 나노초 단위의 long값 리턴
+		getProperty():		사용자 정보 제공
+		getenv():		운영체제의 환경 변수 정보 제공
+
+2. 콘솔 출력
+* out 필드는 콘솔에 원하는 문자열 출력 (err도 동일)
+ex)	try{
+		int value = Interger.parseInt("1oo");
+	} catch(NumberFormatException e) {
+		System.err.println("에러 내용");
+		System.err.println(e.getMessage());
+	}
+
+3. 키보드 입력
+ex)	int keyCode = System.in.read();
+	* 이러면 키의 코드값 얻기 가능 (아스키 코드같은거)
+* read() 메소드는 IOException 발생 가능 코드이므로 예외 처리 필요
+* 엔터를 눌러야 입력했던 키들을 하나씩 읽기 시작
+* Scanner와 비슷하게 키보드로 입력한것들을 저장함
+
+4. 프로세스 종료
+ex)	System.exit(int status)
+	* 정상종료 = 0, 비정상 종료 = 1, -1 이 관례
+
+5. 진행 시간 읽기
+ex)	long time1 = System.nanoTime();
+	long time2 = System.currentTimeMillis();
+
+6. 시스템 프로퍼터 읽기
+* 프로그램이 시작될 때 자동 설정되는 시스템의 속성
+* 별로 안중요 나중에 책으로 예시 공부 ㄱㄱ
+
+
+
+12.5 문자열 클래스
+
+주된 클래스:	String		- 문자열 조작,저장
+		StringBuilder	- 효율적인 문자열 조작 기능
+		StringTokenizer	- 구분자로 연결된 문자열을 분리할 때 사용
+
+1. String 클래스
+* byte 배열을 문자열로 변환
+ex)	String str = new String(byte[] bytes);
+	String str = new String(byte[] bytes, String charsetName);
+
+2. StringBuilder 클래스
+* String은 내부 문자열을 수정할 수 없지만, StringBuilder은 수정가능
+	1. .append(문자열) - 문자열 끝에 추가
+	2. .insert(위치, 문자열) -	문자열을 지정 위치에 추가
+	3. .delete(시작위치, 끝위치) - 문자열 일부를 삭제
+	4. .replace(시작위치, 끝위치, 문자열) - 문자열 일부 대체
+	5. .toString() - 완성된 문자열을 리턴
+
+3. StringTokenizer 클래스
+* split 과 비슷
+ex)	String data = "홍길동/이수홍/박연수";
+	StringTokenizer st = new StringTokenizer(data, "/");
+	st.countTokens() - 분리할 수 있는 문자열의 총 수(int)
+	st.hasMoreTokens() - 남아있는 문자열있는지 여부(boolean)
+	st.nextToken() - 문자열 하나씩 가져옴(String)
+
+
+
+12.6 포장 클래스
+* 포장 객체는 포장하고 있는 기본 타입의 값을 변경할 수 없고, 단지 객체로 생성하는데 목적/ 컬렉션 객체 때문에 필요
+* 기본 자료형을 객체로 취급가능
+기본 자료형을 객체로 다룰 수 있게 함
+포장 클래스는 기본 자료형을 객체로 감싸서 추가적인 기능과 메소드 제공
+제네릭과 컬렉션에서 사용
+기본 자료형은 제네릭에서 사용 불가하기 때문에 포장 클래스를 사용하여 기본 자료형을 객체로 포장하고 제네릭과 컬렉션에서 다룰 수 있음
+객체 간 호환성 제공
+객체만을 다루는 상황에서 기본 자료형을 사용하면 호환성이 제한되지만 포장 클래스를 사용하면 기본 자료형을 객체로 감싸서 전달할 수 있고 호환성도 확보 가능
+널(Null)값 처리
+기본 자료형은 null값을 가질 수 없지만 포장 클래스는 객체이기 때문에 null값을 가질 수 있으며 이를 활용해서 메소드의 반환값, 컬렉션의 요소로 null값을 다룰 수 있음
+
+
+1. 박싱과 언박싱 > 객체 만드는 과정 - 박싱, 객체에서 기본타입의 값을 얻어내는것 언박싱
+ex)	Integer obj = 100; //박싱
+	int valuse = obj; //언박싱
+
+2. 문자열을 기본 타입 값으로 변환
+ex)	int value = Interger.parseInt("String");
+
+3. 포장 값 비교
+ex)	Integer obj1 = 300;
+	Integer obj2 = 300;
+	obj1 == obj2; // false > 객체 번지가 다름(객체 내용은 equals 로 비교)
+	* byte, short, int 는 -128 ~ 127의 값이면 객체 번지까지 같지만 그게 초과되면 달라진다.
+
+
+12.7 수학 클래스
+
+1. Math.abs();		절댓값
+2. Math.ceil();		올림값
+3. Math.floor();	버림값
+4. Math.max(a, b);	최대값
+5. Math.min(a, b);	최소값
+6. Math.random();	0과 1 사이의 랜덤 수 
+7. Math.round();	반올림값
+
+*java.util.Random 클래스로 랜덤 얻을 수 있음
+ex)	Random()
+	Random(long seed) *seed가 같으면 같은 난수를 얻게 된다.
+	
+	Random random = new Random(3);
+	random.nextBoolean()	- boolean 난수
+	random.nextDouble()	- 0.0 부터 1.0 사이 난수
+	random.nextInt()	- -2^32 부터 2^32-1 사이 난수
+	random.nextInt(int n)	- 0 부터 n 사이 난수
+
+
+
+12.8 날짜와 시간 클래스
+
+1. Date		- 날짜 정보 전달
+
+ex)	Date now = new Date(); // Sun Nov 28 19:29:51 KST 2021
+	하지만,
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+	String now2 = sdf.format(now); // 2021.11.28 19:29:51
+	이렇게도 사용가능
+
+2. Calendar	- 다양한 시간대별로 날짜와 시간
+* 달력을 표현하는 추상 클래스
+ex)	Calendar now = Calendar.getInstance(); // 컴퓨터에 설정되어 있는 시간대를 기준으로 calendar 하위 객체 얻기 가능
+	int year = now.get(calendar.YEAR);
+	int month = now.get(calendar.MONTH) + 1;
+	int day = now.get(calendar.DAY_OF_MONTH);
+	int week = now.get(calendar.DAY_OF_WEEK);
+	int amPm = now.get(calendar.AM_PM);
+	int hour = now.get(calendar.HOUR);
+	int minute = now.get(calendar.MINUTE);
+	int second = now.get(calendar.SECOND);
+
+* Calendar 클래스의 오버로딩된 다른 getInstance() 메소드를 이용하면 다른 시간대의 Calnedar을 얻을 수 있다
+ex)	TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
+	Calendar now = Calendar.getInstance( timeZone );
+
+* TimeZone.getAvailableIDs() 메소드는 위에 로스앤잴리스처럼 모든 시간대의 ID를 모두 출력
+ex)	String[] ids = TimeZone.getAvailableIDs();
+
+3. LocalDateTime- 날짜와 시간을 조작할 때 사용
+ex) 	LocalDateTime now = LocalDateTime.now();
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd a HH:mm:ss");
+* 자세한건 책보고 예시를 공부하자(LocalDateTime 메소드들)
+
+
+
+12.9 형식 클래스
+* 숫자 또는 날짜를 원하는 형태의 문자열로 변환
+*java.text 패키지에 포함
+1. DecimalFormat - 숫자를 형식화된 문자열로 변환
+ex)	DecimalFormat df = new DecimalFormat("#,###.0");
+	String result = df.format(123456.89);
+
+2. SimpleDateFormat - 날짜를 형식화된 문자열로 변환
+ex)	SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
+	String strDate = sdf.format(new Date());
+
+
+12.10 정규 표현실 클래스
+* 문자열이 정해져 있는 형식으로 구성되어있는지 검증
+* 자세한건 책으로 공부
+
+
+12.11 리플랙션
+* 메타정보(패키기정보, 타입정보, 멤버(생성자,필드,메소드) 정보)를 읽고 수정하는 행위를 리플렉션이라 함
+ex)	1. Class clazz = 클래스이름.class;
+	2. Class clazz = Class.forNmae("패키지 ... 클래스 이름");
+	3. Class clazz = 객체참조변수.getClass();
+	
+	clazz.getPackage().getName() - 패키지
+	clazz.getSimpleName() - 간단 이름
+	clazz.getName() - 전체 이름
+
+	* 그외에 멤버 정도 얻기, 리소스 정보 얻기등은 책 참고
+
+
+12.12 어노테이션
+* 코드에서 @ 으로 작성되는 요소
+* 클래스 또는 인터페이스를 컴파일하거나 실행할 때 어떻게 처리해야 할 것인지를 알려주는 설정 정보
+
+1. 컴파일 시 사용하는 정보 전달
+2. 빌드 툴이 코드를 자동으로 생성할 때 사용하는 정보 전달
+3. 실행 시 특정 기능을 처리할 때 사용하는 정보 전달
+
+따로 공부하자... 머리 안돌아가네
+
+
+
+
+
