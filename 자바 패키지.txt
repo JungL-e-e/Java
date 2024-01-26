@@ -1,0 +1,25 @@
+<패키지와 접근 제어>
+- 패키지: 연관된 클래스와 인터페이스들을 모아 놓은 것. 즉, 연관된 파일들을 하나의 폴더에 모아서 정리 할 수 있게 함.
+
+1. java.lang 패키지
+	클래스: Object, String, System, Thread, Math 등등
+	인터페이스: Runnable, Iterable, Comparable 등등
+
+2. java.util 패키기
+	클래스: Random, Scanner, ArrayList, HashSet, LingkedList 등등
+	인터페이스: Map, Set, List 등등
+
+- 다른 패키지에 있는 클래스를 이용하려면 다른 패키지에 있는 클래스임을 알리는 방법
+1. 클래스명 앞에 패키지명까지 붙이는 방법
+2. 패키지를 import하여 사용하는 방법: import 클래스명.클래스명
+- 다른 패키지에 있는 클래스의 객체를 만들어 사용하려면 어느 패키지의 클래스인지를 반드시 명시해야 함.
+- java 파일을 구성할 때, 맨 위에는 package 구문이 와야함.
+package 구문은 한 줄만 있어야 함.
+다음으로 import 구문을 적어야 함.
+import 구문은 필요에 따라 여러 줄이 올 수 있음.
+
+<접근제어>
+1. private: 같은 클래스 내에서만 접근 가능
+2. 디폴트 제어: 같은 패키지 내에서만 접근 가능
+3. protected: 같은 패키지 내에서만 접근 가능, 다른 패키지에 있는 자식 클래스에서 접근 가능
+4. public: 어디에서나 접근 가능
